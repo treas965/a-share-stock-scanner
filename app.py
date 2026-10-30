@@ -34,19 +34,19 @@ with st.sidebar:
     body=st.slider('次日阳线实体至少 %',1,12,4)/100
     day2v=st.slider('次日成交量 / 首日最低比',0.5,1.5,1.0,0.05)
     day3v=st.slider('第三日成交量 / 次日最高比',0.3,1.0,0.7,0.05)
-tolerance = st.slider(
+    tolerance = st.slider(
 
-    '第三日最低价跌破MA25容忍 %',
+        '第三日最低价跌破MA25容忍 %',
 
-    min_value=0.0,
+        min_value=0.0,
 
-    max_value=5.0,
+        max_value=5.0,
 
-    value=1.5,
+        value=1.5,
 
-    step=0.5
+        step=0.5
 
-) / 100
+    ) / 100
     workers=st.slider('并发请求数（过高易限流）',1,8,3)
     limit=st.number_input('测试扫描股票数（0=全部）',min_value=0,max_value=6000,value=100,step=100)
     st.caption('首次建议先扫描100只测试数据接口；正式扫描设置为0。')
