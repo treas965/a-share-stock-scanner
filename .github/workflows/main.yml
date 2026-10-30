@@ -1,17 +1,28 @@
-name: A-share Daily Scan
+name: A-share Free Close Scan
 
 on:
   workflow_dispatch:
+    inputs:
+      limit:
+        description: '测试股票数（0表示全部）'
+        required: false
+        default: '100'
+
   schedule:
-    - cron: '29 1 * * 1-5'
+    # 北京时间15:40（UTC 07:40）
+    - cron: '40 7 * * 1-5'
 
 permissions:
   contents: write
 
+concurrency:
+  group: a-share-free-scan
+  cancel-in-progress: false
+
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 180
 
     steps:
       - name: Checkout repository
@@ -27,5 +38,31 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Test scanner
-        run: python scanner.py --help
+      - name: Run close scan
+        env:
+          INPUT_LIMIT: ${{ github.event.inputs.limit }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            LIMIT=0
+          else
+            LIMIT="${INPUT_LIMIT:-100}"
+          fi
+
+          echo "Starting A-share scan"
+          echo "Stock limit: $LIMIT"
+
+          python automation.py --mode close --limit "$LIMIT"
+
+      - name: Save scan results
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add results/ || true
+
+          if ! git diff --cached --quiet; then
+            git commit -m "Update A-share scan results"
+            git push
+          fi
