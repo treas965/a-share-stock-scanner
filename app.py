@@ -34,19 +34,7 @@ with st.sidebar:
     body=st.slider('次日阳线实体至少 %',1,12,4)/100
     day2v=st.slider('次日成交量 / 首日最低比',0.5,1.5,1.0,0.05)
     day3v=st.slider('第三日成交量 / 次日最高比',0.3,1.0,0.7,0.05)
-    tolerance = st.slider(
-
-        '第三日最低价跌破MA25容忍 %',
-
-        min_value=0.0,
-
-        max_value=5.0,
-
-        value=1.5,
-
-        step=0.5
-
-    ) / 100
+    tolerance=st.slider('第三日最低价跌破MA25容忍 %',0.0,5.0,1.5,0.5)/100
     workers=st.slider('并发请求数（过高易限流）',1,8,3)
     limit=st.number_input('测试扫描股票数（0=全部）',min_value=0,max_value=6000,value=100,step=100)
     st.caption('首次建议先扫描100只测试数据接口；正式扫描设置为0。')
@@ -84,10 +72,22 @@ if st.button('▶ 开始收盘扫描',type='primary',use_container_width=True):
 res=st.session_state.results; errs=st.session_state.errors
 c1,c2,c3=st.columns(3)
 c1.metric('当前候选',len(res));c2.metric('数据获取失败',len(errs));c3.metric('形态阶段','第三日收盘')
+st.subheader('云端两阶段任务状态')
+from pathlib import Path
+import json
+status_file=Path(__file__).with_name('data')/'close_status.json'
+if status_file.exists():
+    info=json.loads(status_file.read_text(encoding='utf-8'))
+    st.caption(f"收盘候选更新：{info.get('运行时间','未知')}｜成功取数 {info.get('成功获取',0)} / {info.get('股票总数',0)}｜失败 {info.get('失败',0)}；失败不等于未命中")
+opening_file=Path(__file__).with_name('data')/'opening_check.csv'
+if opening_file.exists():
+    st.warning('9:29结果仅与昨日MA25作初步比较，免费快照可能延迟；不是正式第四日确认。')
+    st.dataframe(pd.read_csv(opening_file,dtype={'代码':str}),use_container_width=True,hide_index=True)
+
 st.subheader('每日自动扫描结果')
 try:
     from pathlib import Path
-    saved = Path(__file__).with_name('scan_results.csv')
+    saved = Path(__file__).with_name('data') / 'candidates.csv'
     if saved.exists():
         cached = pd.read_csv(saved, dtype={'代码': str})
         st.caption(f'云端定时任务最近保存的结果｜文件更新时间：{dt.datetime.fromtimestamp(saved.stat().st_mtime).strftime("%Y-%m-%d %H:%M")}（服务器时间；并非行情时间）')
