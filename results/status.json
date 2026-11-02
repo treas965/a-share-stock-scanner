@@ -1,10 +1,9 @@
 {
-  "run_time_bjt": "2026-10-30T23:17:09.228497+08:00",
+  "run_time_bjt": "2026-11-02T16:44:18.942474+08:00",
   "mode": "close",
   "provider": "BaoStock",
-  "status": "success",
-  "checked": 93,
+  "status": "running",
+  "checked": 0,
   "errors": 0,
-  "matches": 0,
-  "total_universe": 100
+  "matches": 0
 }
