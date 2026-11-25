@@ -1,11 +1,9 @@
 {
-  "run_time_bjt": "2026-11-24T16:46:04.701880+08:00",
+  "run_time_bjt": "2026-11-25T16:51:26.082022+08:00",
   "mode": "close",
   "provider": "BaoStock",
-  "status": "failed",
-  "checked": 4603,
-  "errors": 4555,
-  "matches": 0,
-  "total_universe": 4604,
-  "error": "超过10%股票数据获取失败，结果不完整"
+  "status": "running",
+  "checked": 0,
+  "errors": 0,
+  "matches": 0
 }
